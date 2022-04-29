@@ -15,7 +15,7 @@ const app = express();
 /**
  * 处理excel
  * @param {Object} worksheet 表格
- * @param {file} file 文件路径
+ * @param {String} file 文件路径
  * @param {Array} codes 行政区划的集合
  * @param {Number} limit 控制同时请求的并发数量
  */
@@ -25,7 +25,6 @@ function excel(worksheet,file,codes,limit=2){
             const task = codes.shift();
             if(task){
                 let getRowInsert = worksheet.getRow(task.index+2);
-                // 读出同一行的A列的值
                 // 发送请求 得到temp写入到同一行C中
                 const ret = await axios.get(`http://www.weather.com.cn/data/sk/${task.code}.html`)
                 const temp = ret.data.weatherinfo.temp
@@ -44,6 +43,7 @@ function excel(worksheet,file,codes,limit=2){
     })
     
 }
+//下载文件
 app.get('/download',(req,res)=>{
     //检测文件是否存在
     if(!existsSync(__dirname+'/file/input.xlsx')){
@@ -53,7 +53,7 @@ app.get('/download',(req,res)=>{
         })
         return
     }
-    // 检测input.xlsx是否存在
+    // 将处理好的input.xlsx 文件流返回给前端
     createReadStream(__dirname+'/file/input.xlsx').pipe(res)
 })
 //修改临时文件的储存位置
