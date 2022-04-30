@@ -7,6 +7,7 @@ const {
     createReadStream,
     existsSync 
 } = require('fs')
+// console.log(statSync(__dirname+'/2.png'));
 //form表单需要的中间件。
 const mutipart = require('connect-multiparty');
 
@@ -26,7 +27,21 @@ function excel(worksheet,file,codes,limit=2){
             if(task){
                 let getRowInsert = worksheet.getRow(task.index+2);
                 // 发送请求 得到temp写入到同一行C中
-                const ret = await axios.get(`http://www.weather.com.cn/data/sk/${task.code}.html`)
+                
+                const ret = await axios({
+                    url:`http://www.weather.com.cn/data/sk/${task.code}.html`,
+                    headers:{
+                        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                        'Accept-Encoding':'gzip, deflate',
+                        'Accept-Language':'zh-CN,zh;q=0.9',
+                        'Cache-Control':'no-cache',
+                        'Connection':'keep-alive',
+                        'Host':'www.weather.com.cn',
+                        'Pragma':'no-cache',
+                        'Upgrade-Insecure-Requests':'1',
+                        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36'
+                    }
+                })
                 const temp = ret.data.weatherinfo.temp
                 getRowInsert.getCell('C').value = temp;
                 getRowInsert.commit();
